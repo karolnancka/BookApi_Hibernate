@@ -5,5 +5,4 @@ import pl.coderslab.model.Book;
 
 
 public interface BookRepository extends JpaRepository<Book,Long> {
-
 }
