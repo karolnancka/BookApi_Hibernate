@@ -1,18 +1,19 @@
 package pl.coderslab.controller;
 
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import pl.coderslab.model.Book;
 import pl.coderslab.repository.BookRepository;
 import pl.coderslab.service.BookService;
 
+import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/books")
@@ -35,14 +36,6 @@ public class ManageBookController {
         return "/books/all";
     }
 
-    @GetMapping("/hello")
-    @ResponseBody
-    public String getLandingPage(){
-
-        System.out.println("test SPRING AND HIBERNATE");
-        return "hello Spring MVC! :)";
-    }
-
 
     @GetMapping("/add")
     public String getAddForm(Model m) {
@@ -59,5 +52,33 @@ public class ManageBookController {
         return "redirect:all";
     }
 
+    @GetMapping("/get/{id}")
+    public String getById(@PathVariable long id, Model model){
+        model.addAttribute("book", bookService.get(id).orElseThrow(EntityNotFoundException::new));
+        return "books/getOne";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteById(@PathVariable long id, Model model){
+        bookService.delete(id);
+        List<Book> books = bookService.getBooks();
+        model.addAttribute("books", books);
+        return "books/all";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String editById(@PathVariable long id, Model model){
+        model.addAttribute("book", bookService.get(id));
+        return "books/edit";
+    }
+
+    @PostMapping("/edit")
+    public String editBook(@Valid Book book, BindingResult result) {
+        if (result.hasErrors()) {
+            return "books/edit";
+        }
+        bookService.add(book);
+        return "redirect:/admin/books/all";
+    }
 }
 

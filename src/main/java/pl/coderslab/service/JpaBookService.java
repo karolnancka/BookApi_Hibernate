@@ -2,6 +2,8 @@ package pl.coderslab.service;
 
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.repository.query.Param;
+import org.springframework.expression.EvaluationException;
 import org.springframework.stereotype.Service;
 import pl.coderslab.model.Book;
 import pl.coderslab.repository.BookRepository;
@@ -38,12 +40,11 @@ public class JpaBookService implements BookService {
 
     @Override
     public void delete(Long id) {
-
+        bookRepository.deleteById(id);
     }
 
     @Override
     public void update(Book book) {
-
     }
 }
 
