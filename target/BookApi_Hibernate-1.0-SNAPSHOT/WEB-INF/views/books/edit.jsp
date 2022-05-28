@@ -7,7 +7,8 @@
   <title>Book add</title>
 </head>
 <body>
-<c:url var="edit_url" value="/admin/books/edit"/>
+<%--<c:url var="edit_url" value="/admin/books/edit"/>--%>
+<%--<c:url var="${edit_url}" value="/admin/books/edit"/>--%>
 <form:form method="post" modelAttribute="book" action="${edit_url}">
   <form:hidden path="id"/>
   <form:input path="isbn"/>

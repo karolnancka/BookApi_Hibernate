@@ -13,6 +13,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -53,13 +54,13 @@ public class ManageBookController {
     }
 
     @GetMapping("/get/{id}")
-    public String getById(@PathVariable long id, Model model){
+    public String getById(@PathVariable long id, Model model) {
         model.addAttribute("book", bookService.get(id).orElseThrow(EntityNotFoundException::new));
         return "books/getOne";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteById(@PathVariable long id, Model model){
+    public String deleteById(@PathVariable long id, Model model) {
         bookService.delete(id);
         List<Book> books = bookService.getBooks();
         model.addAttribute("books", books);
@@ -67,7 +68,8 @@ public class ManageBookController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editById(@PathVariable long id, Model model){
+    public String editById(@PathVariable long id, Model model) {
+        model.addAttribute("edit_url", "edit");
         model.addAttribute("book", bookService.get(id));
         return "books/edit";
     }
@@ -78,6 +80,27 @@ public class ManageBookController {
             return "books/edit";
         }
         bookService.add(book);
+        return "redirect:/admin/books/all";
+    }
+
+
+    @GetMapping("/edit2/{id}")
+    public String editById2(@PathVariable long id, Model model) {
+        Optional<Book> bookOptional = bookRepository.findById(id);
+        bookOptional.orElseThrow();
+        model.addAttribute("edit_url", "edit2");
+        bookOptional.ifPresent(book -> model.addAttribute("book", book));
+
+        return "books/edit";
+    }
+
+    @PostMapping("/edit2")
+    public String editBook2(@Valid Book book, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("edit_url", "edit2");
+            return "books/edit";
+        }
+        bookRepository.save(book);
         return "redirect:/admin/books/all";
     }
 }
